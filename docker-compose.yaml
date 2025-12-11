@@ -1,0 +1,31 @@
+x-network: &network
+  - db_network
+
+services:
+  litellm:
+    image: litellm/litellm:v1.80.5.rc.2
+    platform: linux/amd64
+    container_name: litellm
+    ports:
+      - "4000:4000"
+      - "8001:8000"
+    environment:
+      - LITELLM_MASTER_KEY=sk-1234
+      - DATABASE_URL=postgresql://postgres:123456@database:5432/litellm
+      - UI_USERNAME=admin
+      - UI_PASSWORD=admin123
+      - STORE_MODEL_IN_DB=True
+    volumes:
+      - ./data:/app/data
+      - ./config.yaml:/app/config.yaml
+    command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8"]
+    networks: *network
+
+
+networks:
+  db_network:
+    driver: bridge
+    name: db_network
+
+  my_shared_network:
+    external: True
